@@ -29,28 +29,28 @@ namespace Reversi_ROP
             Size = new Size(800, 700);
             MinimumSize = new Size(450, 450);
 
-
-
+           
+            BackColor = Color.FromArgb(40, 45, 50);
 
             // Skore
             lblCerny.Text = "Cerny: 2";
             lblCerny.Location = new Point(20, 20);
             lblCerny.AutoSize = true;
+            lblCerny.ForeColor = Color.White;
 
             lblBily.Text = "Bily: 2";
             lblBily.Location = new Point(150, 20);
             lblBily.AutoSize = true;
+            lblBily.ForeColor = Color.White;
 
             lblTah.Text = "Na tahu: Cerny";
             lblTah.Location = new Point(280, 20);
             lblTah.AutoSize = true;
+            lblTah.ForeColor = Color.White;
 
             Controls.Add(lblCerny);
             Controls.Add(lblBily);
             Controls.Add(lblTah);
-
-
-
 
             // Hraci deska
             hraciDeska.BackColor = Color.Green;
@@ -62,7 +62,6 @@ namespace Reversi_ROP
 
             UpravVelikostDesky();
             AktualizujSkore();
-
         }
 
         private void ZmenaVelikosti(object sender, EventArgs e)
@@ -81,8 +80,6 @@ namespace Reversi_ROP
                 (ClientSize.Width - velikost) / 2, 60);
 
             hraciDeska.Invalidate();
-
-
         }
 
         private void VykresliDesku(object sender, PaintEventArgs e)
@@ -98,6 +95,17 @@ namespace Reversi_ROP
                     float x = sloupec * velikost;
                     float y = radek * velikost;
 
+                    // Stridani barev policek
+                    if ((radek + sloupec) % 2 == 0)
+                    {
+                        g.FillRectangle(Brushes.SeaGreen,
+                            x, y, velikost, velikost);
+                    }
+                    else
+                    {
+                        g.FillRectangle(Brushes.ForestGreen,
+                            x, y, velikost, velikost);
+                    }
 
                     // Policko
                     g.DrawRectangle(Pens.Black, x, y,
@@ -122,11 +130,6 @@ namespace Reversi_ROP
                 }
             }
         }
-
-
-
-
-
 
         private void AktualizujSkore()
         {
