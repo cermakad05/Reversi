@@ -15,12 +15,17 @@ namespace Reversi_ROP
     {
         Deska deska = new Deska();
 
+        StavKamene hracNaTahu = StavKamene.Cerny;
+
         Label lblCerny = new Label();
         Label lblBily = new Label();
         Label lblTah = new Label();
 
         FlowLayoutPanel horniPanel = new FlowLayoutPanel();
-        Panel hraciDeska = new Panel();
+        HerniPanel hraciDeska = new HerniPanel();
+
+        Panel panelTah = new Panel();
+        HerniPanel koleckoTah = new HerniPanel();
 
         public Form1()
         {
@@ -31,38 +36,57 @@ namespace Reversi_ROP
             MinimumSize = new Size(450, 450);
             BackColor = Color.FromArgb(40, 45, 50);
 
-           
+          
             horniPanel.Dock = DockStyle.Top;
-            horniPanel.Height = 55;
-            horniPanel.Padding = new Padding(10, 12, 0, 0);
+            horniPanel.Height = 60;
+            horniPanel.Padding = new Padding(15, 12, 0, 0);
             horniPanel.WrapContents = false;
 
             lblCerny.AutoSize = true;
             lblCerny.ForeColor = Color.White;
-            lblCerny.Margin = new Padding(5, 5, 20, 0);
+            lblCerny.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblCerny.Margin = new Padding(5, 8, 25, 0);
 
             lblBily.AutoSize = true;
             lblBily.ForeColor = Color.White;
-            lblBily.Margin = new Padding(5, 5, 20, 0);
+            lblBily.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblBily.Margin = new Padding(5, 8, 25, 0);
 
-            lblTah.Text = "Na tahu: Černý";
+           
+            panelTah.Size = new Size(150, 35);
+            panelTah.BackColor = Color.FromArgb(35, 93, 72);
+            panelTah.Margin = new Padding(5, 0, 0, 0);
+
+            koleckoTah.Size = new Size(20, 20);
+            koleckoTah.Location = new Point(12, 8);
+            koleckoTah.Paint += VykresliKolecko;
+
+            lblTah.Text = "Na tahu";
             lblTah.AutoSize = true;
             lblTah.ForeColor = Color.White;
-            lblTah.Margin = new Padding(5, 5, 0, 0);
+            lblTah.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblTah.Location = new Point(42, 7);
+
+            panelTah.Controls.Add(koleckoTah);
+            panelTah.Controls.Add(lblTah);
 
             horniPanel.Controls.Add(lblCerny);
             horniPanel.Controls.Add(lblBily);
-            horniPanel.Controls.Add(lblTah);
+            horniPanel.Controls.Add(panelTah);
+
             Controls.Add(horniPanel);
 
-          
+         
             hraciDeska.BackColor = Color.ForestGreen;
             hraciDeska.Paint += VykresliDesku;
+            hraciDeska.MouseClick += KliknutiNaDesku;
+
             Controls.Add(hraciDeska);
 
             Resize += ZmenaVelikosti;
 
             AktualizujSkore();
+            AktualizujTah();
             UpravVelikostDesky();
         }
 
@@ -99,7 +123,6 @@ namespace Reversi_ROP
                     float x = sloupec * velikost;
                     float y = radek * velikost;
 
-                   
                     if ((radek + sloupec) % 2 == 0)
                         g.FillRectangle(Brushes.SeaGreen, x, y, velikost, velikost);
                     else
@@ -107,7 +130,6 @@ namespace Reversi_ROP
 
                     g.DrawRectangle(Pens.Black, x, y, velikost, velikost);
 
-                    
                     StavKamene stav = deska.Policka[radek, sloupec].Stav;
 
                     if (stav == StavKamene.Cerny)
@@ -121,10 +143,68 @@ namespace Reversi_ROP
             }
         }
 
+ 
+        private void VykresliKolecko(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            if (hracNaTahu == StavKamene.Cerny)
+            {
+                g.FillEllipse(Brushes.Black, 1, 1, 18, 18);
+                g.DrawEllipse(Pens.Gray, 1, 1, 18, 18);
+            }
+            else
+            {
+                g.FillEllipse(Brushes.White, 1, 1, 18, 18);
+                g.DrawEllipse(Pens.LightGray, 1, 1, 18, 18);
+            }
+        }
+
+        private void KliknutiNaDesku(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+
+            int sloupec = (int)(e.X / (hraciDeska.Width / 8f));
+            int radek = (int)(e.Y / (hraciDeska.Height / 8f));
+
+            if (radek < 0 || radek >= 8 || sloupec < 0 || sloupec >= 8)
+                return;
+
+            if (deska.Policka[radek, sloupec].Stav != StavKamene.Prazdne)
+                return;
+
+            deska.Policka[radek, sloupec].Stav = hracNaTahu;
+
+            if (hracNaTahu == StavKamene.Cerny)
+                hracNaTahu = StavKamene.Bily;
+            else
+                hracNaTahu = StavKamene.Cerny;
+
+            AktualizujSkore();
+            AktualizujTah();
+
+            hraciDeska.Invalidate();
+        }
+
         private void AktualizujSkore()
         {
             lblCerny.Text = "Černý: " + deska.SpocitejKameny(StavKamene.Cerny);
             lblBily.Text = "Bílý: " + deska.SpocitejKameny(StavKamene.Bily);
+        }
+
+        private void AktualizujTah()
+        {
+            koleckoTah.Invalidate();
+        }
+    }
+
+    public class HerniPanel : Panel
+    {
+        public HerniPanel()
+        {
+            DoubleBuffered = true;
         }
     }
 }
