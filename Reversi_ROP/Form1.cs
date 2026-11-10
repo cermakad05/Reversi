@@ -19,6 +19,7 @@ namespace Reversi_ROP
         Label lblBily = new Label();
         Label lblTah = new Label();
 
+        FlowLayoutPanel horniPanel = new FlowLayoutPanel();
         Panel hraciDeska = new Panel();
 
         public Form1()
@@ -28,40 +29,41 @@ namespace Reversi_ROP
             Text = "Reversi";
             Size = new Size(800, 700);
             MinimumSize = new Size(450, 450);
-
-           
             BackColor = Color.FromArgb(40, 45, 50);
 
-            // Skore
-            lblCerny.Text = "Cerny: 2";
-            lblCerny.Location = new Point(20, 20);
+           
+            horniPanel.Dock = DockStyle.Top;
+            horniPanel.Height = 55;
+            horniPanel.Padding = new Padding(10, 12, 0, 0);
+            horniPanel.WrapContents = false;
+
             lblCerny.AutoSize = true;
             lblCerny.ForeColor = Color.White;
+            lblCerny.Margin = new Padding(5, 5, 20, 0);
 
-            lblBily.Text = "Bily: 2";
-            lblBily.Location = new Point(150, 20);
             lblBily.AutoSize = true;
             lblBily.ForeColor = Color.White;
+            lblBily.Margin = new Padding(5, 5, 20, 0);
 
-            lblTah.Text = "Na tahu: Cerny";
-            lblTah.Location = new Point(280, 20);
+            lblTah.Text = "Na tahu: Černý";
             lblTah.AutoSize = true;
             lblTah.ForeColor = Color.White;
+            lblTah.Margin = new Padding(5, 5, 0, 0);
 
-            Controls.Add(lblCerny);
-            Controls.Add(lblBily);
-            Controls.Add(lblTah);
+            horniPanel.Controls.Add(lblCerny);
+            horniPanel.Controls.Add(lblBily);
+            horniPanel.Controls.Add(lblTah);
+            Controls.Add(horniPanel);
 
-            // Hraci deska
-            hraciDeska.BackColor = Color.Green;
+          
+            hraciDeska.BackColor = Color.ForestGreen;
             hraciDeska.Paint += VykresliDesku;
-
             Controls.Add(hraciDeska);
 
             Resize += ZmenaVelikosti;
 
-            UpravVelikostDesky();
             AktualizujSkore();
+            UpravVelikostDesky();
         }
 
         private void ZmenaVelikosti(object sender, EventArgs e)
@@ -71,13 +73,13 @@ namespace Reversi_ROP
 
         private void UpravVelikostDesky()
         {
-            int velikost = Math.Min(ClientSize.Width,
-                ClientSize.Height - 60) - 20;
+            int volnaVyska = ClientSize.Height - horniPanel.Height;
+            int velikost = Math.Max(8, Math.Min(ClientSize.Width - 30, volnaVyska - 30));
 
             hraciDeska.Size = new Size(velikost, velikost);
-
             hraciDeska.Location = new Point(
-                (ClientSize.Width - velikost) / 2, 60);
+                (ClientSize.Width - velikost) / 2,
+                horniPanel.Height + (volnaVyska - velikost) / 2);
 
             hraciDeska.Invalidate();
         }
@@ -85,8 +87,10 @@ namespace Reversi_ROP
         private void VykresliDesku(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
 
             float velikost = hraciDeska.Width / 8f;
+            float okraj = velikost * 0.1f;
 
             for (int radek = 0; radek < 8; radek++)
             {
@@ -95,49 +99,32 @@ namespace Reversi_ROP
                     float x = sloupec * velikost;
                     float y = radek * velikost;
 
-                    // Stridani barev policek
+                   
                     if ((radek + sloupec) % 2 == 0)
-                    {
-                        g.FillRectangle(Brushes.SeaGreen,
-                            x, y, velikost, velikost);
-                    }
+                        g.FillRectangle(Brushes.SeaGreen, x, y, velikost, velikost);
                     else
-                    {
-                        g.FillRectangle(Brushes.ForestGreen,
-                            x, y, velikost, velikost);
-                    }
+                        g.FillRectangle(Brushes.ForestGreen, x, y, velikost, velikost);
 
-                    // Policko
-                    g.DrawRectangle(Pens.Black, x, y,
-                        velikost, velikost);
+                    g.DrawRectangle(Pens.Black, x, y, velikost, velikost);
 
-                    // Kamen
+                    
                     StavKamene stav = deska.Policka[radek, sloupec].Stav;
 
                     if (stav == StavKamene.Cerny)
-                    {
-                        g.FillEllipse(Brushes.Black,
-                            x + 5, y + 5,
-                            velikost - 10, velikost - 10);
-                    }
+                        g.FillEllipse(Brushes.Black, x + okraj, y + okraj,
+                            velikost - 2 * okraj, velikost - 2 * okraj);
 
                     if (stav == StavKamene.Bily)
-                    {
-                        g.FillEllipse(Brushes.White,
-                            x + 5, y + 5,
-                            velikost - 10, velikost - 10);
-                    }
+                        g.FillEllipse(Brushes.White, x + okraj, y + okraj,
+                            velikost - 2 * okraj, velikost - 2 * okraj);
                 }
             }
         }
 
         private void AktualizujSkore()
         {
-            lblCerny.Text = "Cerny: " +
-                deska.SpocitejKameny(StavKamene.Cerny);
-
-            lblBily.Text = "Bily: " +
-                deska.SpocitejKameny(StavKamene.Bily);
+            lblCerny.Text = "Černý: " + deska.SpocitejKameny(StavKamene.Cerny);
+            lblBily.Text = "Bílý: " + deska.SpocitejKameny(StavKamene.Bily);
         }
     }
 }
