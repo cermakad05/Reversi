@@ -125,7 +125,7 @@ namespace Reversi_ROP
                     g.FillRectangle(Brushes.ForestGreen, x, y, velikost, velikost);
 
                   
-                    g.DrawRectangle(Pens.Black, x, y, velikost, velikost);
+                    
 
                    
                     StavKamene stav = deska.Policka[radek, sloupec].Stav;
@@ -141,6 +141,15 @@ namespace Reversi_ROP
                             velikost - 2 * okraj, velikost - 2 * okraj);
                     }
                 }
+            }
+            g.SmoothingMode = SmoothingMode.None;
+
+            for (int i = 1; i < 8; i++)
+            {
+                float pozice = (float)Math.Round(i * velikost);
+
+                g.DrawLine(Pens.Black, pozice, 0, pozice, hraciDeska.Height);
+                g.DrawLine(Pens.Black, 0, pozice, hraciDeska.Width, pozice);
             }
         }
 
