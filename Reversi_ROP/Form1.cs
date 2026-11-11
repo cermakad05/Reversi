@@ -36,7 +36,7 @@ namespace Reversi_ROP
             MinimumSize = new Size(450, 450);
             BackColor = Color.FromArgb(40, 45, 50);
 
-          
+      
             horniPanel.Dock = DockStyle.Top;
             horniPanel.Height = 60;
             horniPanel.Padding = new Padding(15, 12, 0, 0);
@@ -52,7 +52,7 @@ namespace Reversi_ROP
             lblBily.Font = new Font("Segoe UI", 11, FontStyle.Bold);
             lblBily.Margin = new Padding(5, 8, 25, 0);
 
-           
+          
             panelTah.Size = new Size(150, 35);
             panelTah.BackColor = Color.FromArgb(35, 93, 72);
             panelTah.Margin = new Padding(5, 0, 0, 0);
@@ -73,14 +73,12 @@ namespace Reversi_ROP
             horniPanel.Controls.Add(lblCerny);
             horniPanel.Controls.Add(lblBily);
             horniPanel.Controls.Add(panelTah);
-
             Controls.Add(horniPanel);
 
-         
+          
             hraciDeska.BackColor = Color.ForestGreen;
             hraciDeska.Paint += VykresliDesku;
             hraciDeska.MouseClick += KliknutiNaDesku;
-
             Controls.Add(hraciDeska);
 
             Resize += ZmenaVelikosti;
@@ -123,42 +121,45 @@ namespace Reversi_ROP
                     float x = sloupec * velikost;
                     float y = radek * velikost;
 
-                    if ((radek + sloupec) % 2 == 0)
-                        g.FillRectangle(Brushes.SeaGreen, x, y, velikost, velikost);
-                    else
-                        g.FillRectangle(Brushes.ForestGreen, x, y, velikost, velikost);
+                
+                    g.FillRectangle(Brushes.ForestGreen, x, y, velikost, velikost);
 
+                  
                     g.DrawRectangle(Pens.Black, x, y, velikost, velikost);
 
+                   
                     StavKamene stav = deska.Policka[radek, sloupec].Stav;
 
-                    if (stav == StavKamene.Cerny)
-                        g.FillEllipse(Brushes.Black, x + okraj, y + okraj,
-                            velikost - 2 * okraj, velikost - 2 * okraj);
+                    if (stav != StavKamene.Prazdne)
+                    {
+                        Brush barva = Brushes.Black;
 
-                    if (stav == StavKamene.Bily)
-                        g.FillEllipse(Brushes.White, x + okraj, y + okraj,
+                        if (stav == StavKamene.Bily)
+                            barva = Brushes.White;
+
+                        g.FillEllipse(barva, x + okraj, y + okraj,
                             velikost - 2 * okraj, velikost - 2 * okraj);
+                    }
                 }
             }
         }
 
- 
         private void VykresliKolecko(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            if (hracNaTahu == StavKamene.Cerny)
+            Brush barva = Brushes.Black;
+            Pen okraj = Pens.Gray;
+
+            if (hracNaTahu == StavKamene.Bily)
             {
-                g.FillEllipse(Brushes.Black, 1, 1, 18, 18);
-                g.DrawEllipse(Pens.Gray, 1, 1, 18, 18);
+                barva = Brushes.White;
+                okraj = Pens.LightGray;
             }
-            else
-            {
-                g.FillEllipse(Brushes.White, 1, 1, 18, 18);
-                g.DrawEllipse(Pens.LightGray, 1, 1, 18, 18);
-            }
+
+            g.FillEllipse(barva, 1, 1, 18, 18);
+            g.DrawEllipse(okraj, 1, 1, 18, 18);
         }
 
         private void KliknutiNaDesku(object sender, MouseEventArgs e)
@@ -172,11 +173,11 @@ namespace Reversi_ROP
             if (radek < 0 || radek >= 8 || sloupec < 0 || sloupec >= 8)
                 return;
 
-            if (deska.Policka[radek, sloupec].Stav != StavKamene.Prazdne)
+           
+            if (!deska.PolozKamen(radek, sloupec, hracNaTahu))
                 return;
 
-            deska.Policka[radek, sloupec].Stav = hracNaTahu;
-
+            
             if (hracNaTahu == StavKamene.Cerny)
                 hracNaTahu = StavKamene.Bily;
             else
@@ -184,7 +185,6 @@ namespace Reversi_ROP
 
             AktualizujSkore();
             AktualizujTah();
-
             hraciDeska.Invalidate();
         }
 

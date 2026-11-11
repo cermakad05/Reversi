@@ -18,18 +18,28 @@ namespace Reversi_ROP
             {
                 for (int sloupec = 0; sloupec < 8; sloupec++)
                 {
-                    Policka[radek, sloupec] =
-                        new Policko(radek, sloupec);
+                    Policka[radek, sloupec] = new Policko(radek, sloupec);
                 }
             }
 
-            
+        
             Policka[3, 3].Stav = StavKamene.Bily;
             Policka[3, 4].Stav = StavKamene.Cerny;
             Policka[4, 3].Stav = StavKamene.Cerny;
             Policka[4, 4].Stav = StavKamene.Bily;
         }
 
+  
+        public bool PolozKamen(int radek, int sloupec, StavKamene barva)
+        {
+            if (Policka[radek, sloupec].Stav != StavKamene.Prazdne)
+                return false;
+
+            Policka[radek, sloupec].Stav = barva;
+            return true;
+        }
+
+    
         public int SpocitejKameny(StavKamene barva)
         {
             int pocet = 0;
