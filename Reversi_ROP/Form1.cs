@@ -165,7 +165,7 @@ namespace Reversi_ROP
             if (hracNaTahu == StavKamene.Bily)
             {
                 barva = Brushes.White;
-                okraj = Pens.LightGray;
+                okraj = Pens.Gray;
             }
 
             g.FillEllipse(barva, 1, 1, 18, 18);
