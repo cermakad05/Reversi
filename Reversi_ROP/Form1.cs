@@ -96,7 +96,8 @@ namespace Reversi_ROP
         private void UpravVelikostDesky()
         {
             int volnaVyska = ClientSize.Height - horniPanel.Height;
-            int velikost = Math.Max(8, Math.Min(ClientSize.Width - 30, volnaVyska - 30));
+            int velikost = Math.Min(ClientSize.Width - 30, volnaVyska - 30);
+            velikost = Math.Max(8, velikost / 8 * 8);
 
             hraciDeska.Size = new Size(velikost, velikost);
             hraciDeska.Location = new Point(
